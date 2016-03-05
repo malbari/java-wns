@@ -13,7 +13,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.client.ClientConfig;
-import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.HttpUrlConnectorProvider;
 import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.internal.util.collection.MultivaluedStringMap;
@@ -63,9 +62,10 @@ public class WnsClient {
 		return client;
 	}
 
-	private static Client createClient(boolean logging, WnsProxyProperties proxyProps) {
-		ClientConfig clientConfig = new ClientConfig(JacksonJaxbXMLProvider.class, JacksonJsonProvider.class).connectorProvider(new HttpUrlConnectorProvider());
-		setProxyCredentials(clientConfig, proxyProps);
+	private static Client createClient(boolean logging, WnsProxyProperties pp) {
+		HttpUrlConnectorProvider p = new HttpUrlConnectorProvider();
+		p.connectionFactory(new ProxyEnabledConnectionFactory(pp.getHost(), pp.getPort()));
+		ClientConfig clientConfig = new ClientConfig(JacksonJaxbXMLProvider.class, JacksonJsonProvider.class).connectorProvider(p);
 
 		Client client = ClientBuilder.newClient(clientConfig);
 		if (logging) {
@@ -74,26 +74,6 @@ public class WnsClient {
 			client = client.register(loggingFilter);
 		}
 		return client;
-	}
-
-	private static void setProxyCredentials(ClientConfig clientConfig, WnsProxyProperties proxyProps) {
-		if (proxyProps != null) {
-			String proxyProtocol = proxyProps.getProtocol();
-			String proxyHost = proxyProps.getHost();
-			int proxyPort = proxyProps.getPort();
-			String proxyUser = proxyProps.getUser();
-			String proxyPass = proxyProps.getPass();
-
-			if ((proxyHost != null) && (!proxyHost.trim().isEmpty())) {
-				clientConfig.property(ClientProperties.PROXY_URI, proxyProtocol + "://" + proxyHost + ":" + proxyPort);
-				if (!proxyUser.trim().isEmpty()) {
-					clientConfig.property(ClientProperties.PROXY_PASSWORD, proxyPass);
-					clientConfig.property(ClientProperties.PROXY_USERNAME, proxyUser);
-				}
-			}
-
-		}
-
 	}
 
 	/**
