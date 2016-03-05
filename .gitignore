@@ -79,7 +79,9 @@ dependency-reduced-pom.xml
 # https://raw.githubusercontent.com/github/gitignore/master/Gradle.gitignore
 
 .gradle
-build/
+
+#build not ignored
+#build/
 
 # Ignore Gradle GUI config
 gradle-app.setting
