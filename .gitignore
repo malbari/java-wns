@@ -6,7 +6,10 @@
 .mtj.tmp/
 
 # Package Files #
-*.jar
+
+# JAR not ignored to enable maven repo on GitHub
+# *.jar
+
 *.war
 *.ear
 
